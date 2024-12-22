@@ -1,0 +1,32 @@
+AS = nasm
+CC = gcc
+LD = ld
+CFLAGS = -ffreestanding -O2 -Wall -Wextra
+LDFLAGS = -nostdlib -lgcc
+
+OBJDIR = obj
+OUTDIR = out
+
+BOOTASM = boot.asm
+KERNELC = kernel.c
+OBJ = $(OBJDIR)/boot.o $(OBJDIR)/kernel.o
+BIN = $(OUTDIR)/os.iso
+
+all: $(BIN)
+
+$(OBJDIR)/boot.o: $(BOOTASM)
+	$(AS) -f elf16 $(BOOTASM) -o $(OBJDIR)/boot.o
+
+$(OBJDIR)/kernel.o: $(KERNELC)
+	$(CC) $(CFLAGS) -c $(KERNELC) -o $(OBJDIR)/kernel.o
+
+$(BIN): $(OBJ)
+	$(LD) -T linker.ld $(OBJ) -o $(OUTDIR)/kernel.bin
+	# Create the ISO image
+	mkdir -p $(OUTDIR)/iso
+	cp $(OUTDIR)/kernel.bin $(OUTDIR)/iso
+	# You can use GRUB to create a bootable ISO image
+	grub-mkrescue -o $(BIN) $(OUTDIR)/iso
+
+clean:
+	rm -rf $(OBJDIR) $(OUTDIR)

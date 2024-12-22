@@ -1,1 +1,1 @@
-# terry-os-sm
+NGL kinda wanna cry lol
